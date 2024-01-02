@@ -84,9 +84,6 @@ function verifySignature(data, SIGNATURE, SECRET) {
 }
 
 app.use('/', (req, res) => {
-    console.log("=== Checking Webhook Signature ===")
-    console.log(req.headers['x-webhook-signature'])
-    console.log(req.body)
     if (verifySignature(req.body, req.headers['x-webhook-signature'], 'abc123')) {
         console.log('Successfully Verified')
         res.send('Successfully Verified')

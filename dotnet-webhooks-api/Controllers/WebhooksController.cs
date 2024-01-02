@@ -289,11 +289,6 @@ public class WebhookController : ControllerBase
                 signature = Request.Headers["x-webhook-signature"];
             }
 
-            Console.WriteLine(Request.Headers["x-webhook-signature"]);
-            Console.WriteLine(data);
-            Console.WriteLine(data.Payload.ExclusionReasons.ToList());
-
-
             var jsonData = data.toDictionary(data);
 
             var payloadString = WebhookStringPayload.ConvertToString(jsonData).ToLower();
