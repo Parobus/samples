@@ -1,0 +1,6 @@
+@WebhookDotNetTest_HostAddress = http://localhost:5069
+
+POST {{WebhookDotNetTest_HostAddress}}/webhook/
+Accept: application/json
+
+###
