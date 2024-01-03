@@ -70,7 +70,7 @@ function verifySignature(data, SIGNATURE, SECRET) {
             return false;
         }
 
-        const hmac = createHmac(algorithm, secret);
+        const hmac = createHmac("sha512", secret);
         hmac.update(`${timestamp}.${payload}`);
         const computedHash = hmac.digest('base64');
         if (computedHash === hash) {
