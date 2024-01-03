@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 6000
+const port = 5069
 
 app.use(express.json())
 
@@ -26,7 +26,8 @@ class WebhookStringPayload {
             return Object.entries(map)
                 .flatMap((entry) => WebhookStringPayload.flattenKeyValue(entry))
                 .sort()
-                .join(",");
+                .join(",")
+                .toLowerCase();
         } else {
             throw new Error("Input must be a non-null object.");
         }
@@ -69,7 +70,7 @@ function verifySignature(data, SIGNATURE, SECRET) {
             return false;
         }
 
-        const hmac = createHmac("sha256", secret);
+        const hmac = createHmac(algorithm, secret);
         hmac.update(`${timestamp}.${payload}`);
         const computedHash = hmac.digest('base64');
         if (computedHash === hash) {
@@ -83,7 +84,34 @@ function verifySignature(data, SIGNATURE, SECRET) {
     return verify(SIGNATURE, PAYLOAD, SECRET)
 }
 
-app.use('/', (req, res) => {
+d = {
+    payload: {
+        additionalInformation: 'No products available for fixed 5 years',
+        amount: 0,
+        amountMax: 0,
+        case: { status: 'pending', uuid: 'QD100008999' },
+        exclusionReasons: [],
+        index: { index: 39, total: 54 },
+        lender: {
+            btl: false,
+            name: 'Mansfield Building Society',
+            notices: [],
+            primaryLender: null,
+            reference: 'mansfield',
+            resi: true,
+            type: 'first_charge'
+        },
+        screenshotPdfUrl: null,
+        status: null
+    },
+    topic: 'case_results'
+}
+
+console.log(WebhookStringPayload.convertToString(d))
+
+
+
+app.use('/webhook', (req, res) => {
     if (verifySignature(req.body, req.headers['x-webhook-signature'], 'abc123')) {
         console.log('Successfully Verified')
         res.send('Successfully Verified')

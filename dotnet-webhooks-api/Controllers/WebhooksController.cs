@@ -135,10 +135,10 @@ public class WebhookBodyModel
 
 public enum Algorithm
 {
-    Sha224,
-    Sha256,
-    Sha384,
-    Sha512
+    sha224,
+    sha256,
+    sha384,
+    sha512
 }
 public struct Signature
 {
@@ -189,7 +189,9 @@ public class SignatureVerifier
             return false;
         }
         var secret = Encoding.ASCII.GetBytes(secretString);
-        using (HMACSHA256 hmac = new HMACSHA256(secret))
+        Console.WriteLine(signature.Algorithm);
+
+        using (HMACSHA512 hmac = new HMACSHA512(secret))
         {
             var storedHash = new byte[hmac.HashSize / 8];
             var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(timestampAndPayload));
@@ -201,6 +203,7 @@ public class SignatureVerifier
                 }
             }
         }
+
         return true;
     }
 }
@@ -297,7 +300,7 @@ public class WebhookController : ControllerBase
             var verifier = new SignatureVerifier();
             var parser = new SignatureParser();
             var sig = parser.Parse(signature);
-            bool isValid = verifier.Verify(sig, "abc123", payloadString);
+            bool isValid = verifier.Verify(sig, "abc123", payloadString.ToLower());
             if (isValid)
             {
                 Console.WriteLine("Successfully Verified");
