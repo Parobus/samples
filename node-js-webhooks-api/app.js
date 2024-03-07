@@ -84,34 +84,8 @@ function verifySignature(data, SIGNATURE, SECRET) {
     return verify(SIGNATURE, PAYLOAD, SECRET)
 }
 
-d = {
-    payload: {
-        additionalInformation: 'No products available for fixed 5 years',
-        amount: 0,
-        amountMax: 0,
-        case: { status: 'pending', uuid: 'QD100008999' },
-        exclusionReasons: [],
-        index: { index: 39, total: 54 },
-        lender: {
-            btl: false,
-            name: 'Mansfield Building Society',
-            notices: [],
-            primaryLender: null,
-            reference: 'mansfield',
-            resi: true,
-            type: 'first_charge'
-        },
-        screenshotPdfUrl: null,
-        status: null
-    },
-    topic: 'case_results'
-}
-
-console.log(WebhookStringPayload.convertToString(d))
-
-
-
 app.use('/webhook', (req, res) => {
+    console.log(req.body)
     if (verifySignature(req.body, req.headers['x-webhook-signature'], 'abc123')) {
         console.log('Successfully Verified')
         res.send('Successfully Verified')
@@ -124,5 +98,5 @@ app.use('/webhook', (req, res) => {
 })
 
 app.listen(port, () => {
-    console.log(`Example app listening on http://locallhost:${port}`)
+    console.log(`Example app listening on http://localhost:${port}`)
 })
