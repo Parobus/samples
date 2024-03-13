@@ -4,19 +4,25 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 
-class WebhookStringPayload {
-    public static function flattenKeyValue($key, $value) {
+class WebhookStringPayload
+{
+    public static function flattenKeyValue($key, $value)
+    {
+        $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+
         if (is_array($value) || is_object($value)) {
-            if (is_array($value)) {
+            if (is_array($value) && array_keys($value) !== range(0, count($value) - 1)) {
+                $out->writeln(json_encode($value));
                 $output = [];
-                foreach ($value as $index => $element) {
-                    $output = array_merge($output, self::flattenKeyValue("{$key}.{$index}", $element));
+                foreach ($value as $subkey => $element) {
+                    $output = array_merge($output, self::flattenKeyValue("{$key}.{$subkey}", $element));
                 }
                 return $output;
             } else {
+                $out->writeln(json_encode($value));
                 $output = [];
-                foreach ($value as $subkey => $subvalue) {
-                    $output = array_merge($output, self::flattenKeyValue("{$key}.{$subkey}", $subvalue));
+                foreach ($value as $index => $element) {
+                    $output = array_merge($output, self::flattenKeyValue("{$key}[$index]", $element));
                 }
                 return $output;
             }
@@ -25,7 +31,8 @@ class WebhookStringPayload {
         }
     }
 
-    public static function convertToString($map) {
+    public static function convertToString($map)
+    {
         if (is_array($map) || is_object($map)) {
             $output = [];
             foreach ($map as $key => $value) {
@@ -38,11 +45,12 @@ class WebhookStringPayload {
         }
     }
 
-    public static function putValue($value) {
+    public static function putValue($value)
+    {
         if ($value === null) {
             return '';
         }
-        if(is_bool($value)) {
+        if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
         return $value;
@@ -51,7 +59,8 @@ class WebhookStringPayload {
 
 class WebhookHandler
 {
-    public function verify($timestamp, $signatureFull, $payloadString, $secretKey, $algorithm) {
+    public function verify($timestamp, $signatureFull, $payloadString, $secretKey, $algorithm)
+    {
 
         $integerTimestamp = intval($timestamp);
 
@@ -62,7 +71,7 @@ class WebhookHandler
         $payload = strtolower($payloadString);
 
         $computedHash = hash_hmac($algorithm, "{$timestamp}.{$payload}", $secretKey, true);
-        
+
         $computedHashBase64 = base64_encode($computedHash);
 
 
@@ -101,7 +110,7 @@ class WebhookHandler
         } else {
             $out->writeln("Webhook verified");
         }
-       
+
         return $verifySignature;
     }
     public function flattenArray($array, $prefix = '')
